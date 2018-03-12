@@ -1,20 +1,20 @@
 package ma.elarbi.jdbc;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class DBHelper {
+    public static final String CONN_URL = "jdbc:mysql://localhost:3306/dari?user=root&password=manager&useSSL=false";
 
-    public static void viewTable(Connection con, String dbName) throws SQLException {
+    public static void viewTable(String dbName, String tableName) throws SQLException {
 
         Statement stmt = null;
 
-        String query = "select id, firstname from " + dbName + ".PERSON";
+        String query = "select id, firstname from " + dbName + "." + tableName;
         try {
 
-            stmt = con.createStatement();
+            Connection connection = DriverManager.getConnection(CONN_URL);
+
+            stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(query);
 
             while (rs.next()) {

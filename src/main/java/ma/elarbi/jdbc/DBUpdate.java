@@ -1,34 +1,52 @@
 package ma.elarbi.jdbc;
 
 import java.sql.*;
+import java.util.Arrays;
+import java.util.List;
 
 public class DBUpdate {
+    public static final String SCHEMA_NAME = "dari";
+    private static final String PERSON_TABLE_NAME = "PERSON";
 
     //https://docs.oracle.com/javase/tutorial/jdbc/basics/processingsqlstatements.html
 
     public static void main(String[] args) throws SQLException {
+        String firstName = "TOTO";
 
-        String connURL = "jdbc:mysql://localhost:3306/dari?user=root&password=manager&useSSL=false";
-        Connection conn = null;
+        List<String> personFirstNames = Arrays.asList("Mohammed", "Issam", "Lamia");
 
-        try {
+        Connection conn = DriverManager.getConnection(DBHelper.CONN_URL);
+        for (String personFirstName : personFirstNames) {
 
-            conn = DriverManager.getConnection(connURL);
-            Statement statement = conn.createStatement();
-            statement.execute(QUERIES.INSERT_INTO_PERSON);
+            PreparedStatement statement = conn
+                    .prepareStatement(QUERIES.INSERT_INTO_PERSON_WITH_PARAMETER);
 
-            DBHelper.viewTable(conn, "dari");
+            statement.setString(1, personFirstName);
+            statement.execute();
 
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-
-        } finally {
-
-            conn.close();
         }
-
+        DBHelper.viewTable(SCHEMA_NAME, PERSON_TABLE_NAME);
     }
 
 
+    private static void insertPerson(String firstName) throws SQLException {
+
+
+        try (Connection conn = DriverManager.getConnection(DBHelper.CONN_URL)) {//Créer une connexion vers la BD mysql avec l'url
+
+            //Créer un objet Statement pour lancer une requete vers ma BD
+            PreparedStatement statement = conn
+                    .prepareStatement("INSERT INTO PERSON(firstname) VALUES (?)");
+
+            statement.setString(1, firstName);
+
+            //Première requet d'insert d'un enregistrement
+            statement.execute();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+    }
 }
